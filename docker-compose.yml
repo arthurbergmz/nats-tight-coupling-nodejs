@@ -1,0 +1,32 @@
+version: '3'
+services:
+  nats:
+    image: nats:latest
+    ports:
+      - 4222:4222
+      - 8222:8222
+      - 6222:6222
+    networks: ["nats"]
+  project-a:
+    build:
+      context: .
+      dockerfile: DockerfileA
+    ports:
+      - 3000:3000
+    depends_on: ["nats"]
+    networks: ["nats"]
+    environment:
+      - NATS_ADDRESS=nats://nats:4222
+  project-b:
+    build:
+      context: .
+      dockerfile: DockerfileB
+    ports:
+      - 3001:3001
+    depends_on: ["nats"]
+    networks: ["nats"]
+    environment:
+      - NATS_ADDRESS=nats://nats:4222
+networks:
+  nats:
+    name: nats
